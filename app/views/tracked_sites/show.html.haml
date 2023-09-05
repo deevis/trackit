@@ -1,0 +1,76 @@
+:css
+  img { display: block; margin: auto;}
+
+- site_source = @tracked_site.class.display_name
+- category = @tracked_site.category
+
+.page-header
+  = link_to tracked_sites_path(category: category,site_source: site_source), class: 'action-back' do
+    #{site_source}/#{category}
+  = link_to edit_tracked_site_path(@tracked_site), class: 'action-edit' do
+    Edit
+  = link_to 'Scrape Latest', scrape_latest_tracked_site_path(@tracked_site), class: 'action-secondary'
+  -if @tracked_site.url.present?
+    %span.text-sm.px-3= link_to "View Source", @tracked_site.url, target: "_blank"
+  -elsif @tracked_site.is_child_variant?
+    %span.text-sm.px-3= link_to "View Source", @tracked_site.tracked_site_parent.url, target: "_blank"
+    %span.text-sm.px-3= link_to "View Parent", @tracked_site.tracked_site_parent
+
+
+  %div
+    
+
+.grid.grid-cols-3
+
+  %div
+    %h1.text-2xl
+      =@tracked_site.display_name
+      -if @tracked_site.image.present?
+        = image_tag @tracked_site.image.variant(resize: "200x200")
+
+
+    %div
+      A Pretty Graph goes here?
+
+
+  - earliest_tsd = @tracked_site.tracked_site_data.first
+
+  %div
+    %hs.text-2xl 
+      Price Information
+      %span.text-xs
+        Since #{earliest_tsd&.start_time&.strftime("%Y-%m-%d")}
+    %dl.dl-horizontal
+      %div{class:"bg-gray-50 px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"}
+        %dt Current:
+        %dd.whitespace-nowrap=render 'tracked_sites/display_price', tracked_site: @tracked_site, show_date: 'true', limit: 1
+      %div{class:"bg-gray-50 px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"}
+        %dt Lowest:
+        %dd.whitespace-nowrap=render 'tracked_sites/display_price', tsd: @tracked_site.lowest_price_tracked_site_datum, show_date: 'true'
+      %div{class:"bg-gray-50 px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"}
+        %dt Highest:
+        %dd.whitespace-nowrap=render 'tracked_sites/display_price',  tsd: @tracked_site.highest_price_tracked_site_datum, show_date: 'true'
+    -if (!@tracked_site.is_child_variant? && variants = @tracked_site.get_pricing_variants).present?
+      -used_variants = [@tracked_site.variant_definition || @tracked_site.get_default_variant]
+      %hs.text-2xl Tracked Variants
+      -@tracked_site.child_variants.each do |cv|
+        -used_variants << cv.variant_definition
+        .child-variant
+          %div
+            =link_to cv.variant_definition, cv
+          %div=render 'tracked_sites/display_price',  tracked_site: cv, show_date: 'true', limit: 1
+      %hs.text-2xl Available Variants
+
+      -(variants - used_variants).each do |variant|
+        .available-variant
+          = variant
+          =link_to 'Create', add_child_variant_tracked_site_path(@tracked_site, variant: variant.to_json), method: :post, data: { turbo_method: :post, turbo_confirm: "Are you sure you want to create a new top-level TrackedSite variant for '#{variant}'?"}, class: "text-xs action-secondary px-0 py-0"
+
+
+  %div
+    %h3.text-2xl Historical Data
+    %hr
+    -if @tracked_site.tracked_site_data.present?
+      =render 'tracked_sites/display_price', tracked_site: @tracked_site, show_date: 'true', limit: 180
+    - else
+      No Data

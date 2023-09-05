@@ -1,0 +1,13 @@
+.page-header
+  .float-right
+    = link_to stations_path, class: 'btn btn-info' do
+      %span.glyphicon.glyphicon-list-alt
+      Back
+    = link_to @station, class: 'btn btn-primary' do
+      %span.glyphicon.glyphicon-info-sign
+      Show
+    = link_to 'Destroy', @station, data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-danger'
+
+  %h1 Editing station
+
+= render 'form'

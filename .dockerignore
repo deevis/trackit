@@ -1,0 +1,6 @@
+.git
+log/development.log
+storage
+tmp/cache
+test
+*.html

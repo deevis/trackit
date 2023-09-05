@@ -1,0 +1,36 @@
+-show_date ||= 'false'
+-limit ||= nil
+-tsd ||= nil
+
+-if limit
+  -tsds = tracked_site.tracked_site_data.last(limit).reverse
+-elsif tsd.present?
+  -tsds = [tsd]
+-else
+  -tsds = [tracked_site.tracked_site_data.last]
+
+-tsds.each do |tsd|
+  -pricing = tsd.data
+  -price = pricing['price']
+  -regular_price = pricing['regular_price']
+  -savings = (regular_price.present? && regular_price > price) ? (regular_price - price) : nil
+  .py-0
+    -if pricing['unavailable']
+      %span.whitespace-wrap
+        %div.text-lg.text-red-600 UNAVAILABLE
+        %div.text-sm.text-red-500= pricing['inactive_message']
+    -else
+      %span.text-lg=number_to_currency(price)
+    -if savings
+      %span.text-xs.line-through=number_to_currency(regular_price)
+      -savings = regular_price - price
+    -if savings
+      %span.text-xs.bg-red-700.text-white.p-1.whitespace-nowrap.rounded
+        Save #{number_to_currency(savings)}
+    -if tsd.get_price == tracked_site.lowest_price && tsd.get_price < tracked_site.highest_price
+      %span.text-xs.bg-green-700.text-white.p-1.whitespace-nowrap.rounded{"data-tooltip-target" => "best_price_tooltip_#{tsd.tracked_site.id}"}
+        Best Price
+      %div.inline-block.absolute.invisible.z-10.px-3.text-sm.bg-gray-800.text-white.rounded{id: "best_price_tooltip_#{tsd.tracked_site.id}"}
+        Best price since #{tracked_site.lowest_price_tracked_site_datum.start_time.strftime("%m/%d/%Y")}
+    -if show_date == 'true'
+      %span.text-xs.px-2.whitespace-nowrap=tsd.start_time.strftime("%Y-%m-%d")

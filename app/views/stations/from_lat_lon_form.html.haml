@@ -1,0 +1,10 @@
+%h1 
+  Create Forecast Location
+  %small
+    From lat/lon
+
+=form_for :coords, url: create_from_lat_lon_stations_path do |f|
+  =f.text_field :lat, placeholder: "lat" 
+  =f.text_field :lon, placeholder: "lon"
+  =f.submit "Create from lat lon"
+

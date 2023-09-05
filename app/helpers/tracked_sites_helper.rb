@@ -1,0 +1,2 @@
+module TrackedSitesHelper
+end

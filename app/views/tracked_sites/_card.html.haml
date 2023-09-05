@@ -1,0 +1,26 @@
+=cache tracked_site do
+  .max-w-sm.rounded.overflow-hidden.shadow-lg.mb-10.relative
+    .bg-sky-800.text-white.px-3.py-2
+      .flex.flex-row.justify-between
+        .text-sm=link_to tracked_site.display_name, tracked_site
+
+    .grid.grid-cols-2
+      .px-2.py-2
+        -if tracked_site.tracked_site_data.present?
+          .px-1.py-1
+            =render 'tracked_sites/display_price', tracked_site: tracked_site
+        .px-2.py-2
+          %span.text-xs= tracked_site.category || "---"
+          %span /
+          %span.text-xs=  tracked_site.sub_category || "---"
+
+      .px-1.py-3
+        - if tracked_site.image.present?
+          = link_to tracked_site.url, target: "_blank" do
+            = image_tag tracked_site.image.variant(resize: "200x200") 
+    .grid.grid-cols-2
+      %div
+        =tracked_site.tracked_site_data.last&.end_time&.strftime("%m/%d/%Y")
+      %div
+        -if tracked_site.type.present?
+          = link_to tracked_site.type.split("::").last, tracked_site.url, target: "_blank"

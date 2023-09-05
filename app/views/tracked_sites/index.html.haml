@@ -1,0 +1,70 @@
+.site-sources.bg-blue-800.p-2
+  -@classes.each do |c|
+    -if @class && @class.display_name == c.display_name
+      %span.text.text-white.px-1.bg-blue-600.p-2
+        =link_to c.display_name, tracked_sites_path(site_source: c.display_name)
+    -else
+      %span.text.text-white.px-1.bg-blue-800.p-2
+        =link_to c.display_name, tracked_sites_path(site_source: c.display_name)
+  = link_to "New Tracked site", new_tracked_site_path, class: 'action-secondary float-right'
+
+.category-bar.bg-blue-800.p-1
+  -@categories.each do |name, count|
+    -if name == params[:category]
+      %span.text-xs.text-white.p-1.bg-blue-700
+        =link_to name, tracked_sites_path(category: name, site_source: @class&.display_name.presence)
+    -else
+      %span.text-xs.text-white.p-1.bg-blue-500
+        =link_to name, tracked_sites_path(category: name, site_source: @class&.display_name.presence)
+
+.flex.flex-row.justify-between.py-5.mx-10
+  %h2.text-xl
+    = @title
+    %span.text-sm
+      -if @tracked_sites.any?
+        = "#{@tracked_sites.count} found "
+      As of #{Time.now.strftime("%H:%M %m/%d/%Y")}
+
+
+-if @best_buy_lowest_prices.present?
+  .px-5.py-5.h3.text-xl #{@best_buy_lowest_prices.length} Items at BestBuy at their best price ever
+  %hr
+  .grid.grid-cols-1.gap-8.mx-5{class: "md:grid-cols-4"}
+    -@best_buy_lowest_prices.each do |tracked_site|
+      = render 'tracked_sites/card', tracked_site: tracked_site
+
+.grid.grid-cols-1.gap-8.mx-5{class: "md:grid-cols-4"}
+  -@tracked_sites.each do |tracked_site|
+    - next if @best_buy_lowest_prices.include?(tracked_site)
+    = render 'tracked_sites/card', tracked_site: tracked_site
+
+/ %div{class: "relative overflow-x-auto shadow-md sm:rounded-lg"}
+/   %table{class: "w-full text-sm text-left text-gray-500 dark:text-gray-400"}
+/     %thead{class: "text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"}
+/       %tr{class: "bg-white border-b dark:bg-gray-800 dark:border-gray-700"}
+/         %th Name
+/         %th Data
+/         %th Type
+/         %th Category
+/         %th Sub category
+/         %th
+
+/     %tbody
+/       - @tracked_sites.each do |tracked_site|
+/         %tr{class: "bg-white border-b dark:bg-gray-800 dark:border-gray-700"}
+/           %td{style: 'max-width: 250px;'}= link_to tracked_site.name, tracked_site_path(tracked_site)
+/           %td
+/             - if (tsd = tracked_site.tracked_site_data.last(10)).present?
+/               -tsd.reverse.each do |d|
+/                 .li
+/                   =tracked_site.get_data_html(d)
+/             - else
+/               No Data
+/           %td
+/             -if tracked_site.image.present?
+/               = image_tag tracked_site.image.variant(resize: "200x200")
+/             = link_to tracked_site.type || "TrackedSite", tracked_site.url, target: "_blank"
+/           %td= tracked_site.category
+/           %td= tracked_site.sub_category
+/           %td
+/             = link_to 'Show', tracked_site_path(tracked_site), class: "action-primary"

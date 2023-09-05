@@ -1,0 +1,32 @@
+# == Schema Information
+#
+# Table name: tracked_sites
+#
+#  id                                  :bigint           not null, primary key
+#  name                                :string(255)
+#  url                                 :string(255)
+#  category                            :string(255)
+#  sub_category                        :string(255)
+#  created_at                          :datetime         not null
+#  updated_at                          :datetime         not null
+#  type                                :string(64)
+#  current_price                       :decimal(10, 2)
+#  current_price_date                  :datetime
+#  lowest_price                        :decimal(10, 2)
+#  lowest_price_date                   :datetime
+#  lowest_price_tracked_site_datum_id  :bigint
+#  highest_price                       :decimal(10, 2)
+#  highest_price_date                  :datetime
+#  highest_price_tracked_site_datum_id :bigint
+#  unavailable                         :boolean          default(FALSE)
+#  tracked_site_parent_id              :bigint
+#  variant_definition                  :text(4294967295)
+#
+
+require 'test_helper'
+
+class TrackedSiteTest < ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end

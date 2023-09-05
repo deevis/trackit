@@ -1,0 +1,35 @@
+= form_for @station, html: { class: "form-horizontal", role: "form" } do |f|
+  -if @station.errors.any?
+    .alert.alert-danger.alert-dismissable{role: "alert"}
+      %button.close{type: "button", data: {dismiss: "alert"} }
+        %span{aria: {hidden: "true"} } &times;
+        %span.sr-only Close
+      %h4= "#{pluralize(@station.errors.count, "error")} prohibited this station from being saved:"
+
+      %ul
+        - @station.errors.full_messages.each do |msg|
+          %li= msg
+
+  .form-group
+    = f.label :name, class: 'col-sm-2 control-label'
+    .col-sm-10
+      = f.text_field :name, class: 'form-control'
+  .form-group
+    = f.label :code, class: 'col-sm-2 control-label'
+    .col-sm-10
+      = f.text_field :code, class: 'form-control'
+  .form-group
+    = f.label :city, class: 'col-sm-2 control-label'
+    .col-sm-10
+      = f.text_field :city, class: 'form-control'
+  .form-group
+    = f.label :state, class: 'col-sm-2 control-label'
+    .col-sm-10
+      = f.text_field :state, class: 'form-control'
+  .form-group
+    = f.label :data, class: 'col-sm-2 control-label'
+    .col-sm-10
+      = f.text_area :data, class: 'form-control', rows: 10
+  .form-group
+    .col-sm-offset-2.col-sm-10
+      = f.submit class: 'btn btn-primary'

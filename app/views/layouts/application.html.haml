@@ -1,0 +1,56 @@
+!!!
+%html
+  %head
+    %meta{charset: "utf-8"}
+    %meta{content: "IE=edge", "http-equiv" => "X-UA-Compatible"}
+    %meta{content: "width=device-width, initial-scale=1", name: "viewport"}
+    %meta{content: "", name: "description"}
+    %meta{content: "", name: "author"}
+    %title Starter Template for Bootstrap
+
+    / HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
+    /[if lt IE 9]
+      = javascript_include_tag "https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js", "https://oss.maxcdn.com/respond/1.4.2/respond.min.js"
+
+    = stylesheet_link_tag    'application', 'data-turbo-track' => "reload"
+    = javascript_include_tag 'application', 'data-turbo-track' => "reload", defer: true
+    = javascript_include_tag "https://www.gstatic.com/charts/loader.js"
+    = csrf_meta_tags
+
+    =content_for(:head)
+
+  %body
+    %nav{class: "flex items-center justify-between flex-wrap bg-teal-500 p-6"}
+      %div{class: "flex items-center flex-shrink-0 text-white mr-6"}
+        %span{class: "font-semibold text-2xl tracking-tight"} Tracker Checker
+
+      %button{"data-collapse-toggle"=>"mobile-menu", type:"button", class:"inline-flex justify-center items-center ml-3 text-gray-400 rounded-lg md:hidden hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-400 dark:hover:text-white dark:focus:ring-gray-500", "aria-controls"=>"mobile-menu-2", "aria-expanded"=>"false"}
+        %svg{class:"fill-current h-3 w-3", viewBox:"0 0 20 20", xmlns:"http://www.w3.org/2000/svg"}
+          %title Menu
+          %path{d:"M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"}
+      %div.hidden.w-full{id: "mobile-menu", class: "md:block md:w-auto"}
+        %ul{class: "w-full block flex-grow lg:flex lg:items-center lg:w-auto"}
+          %li
+            %a{href: root_path, class: "block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"} Forecasts
+          %li
+            %a{href: tracked_sites_path, class: "block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"} Products
+          %li
+            %a{href: "#contact", class: "block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"} Contact
+      %div.flex.items-center.relative
+        -if current_user
+          %div.dropdown.relative
+            %a.dropdown-toggle{id:"loggedInUserNavItem", role:"button", "data-dropdown-toggle"=>"loggedInUserNavDropdown", "aria-expanded"=>"false"}=current_user.email
+            %ul.dropdown-menu.hidden.z-10.bg-white.divide-y.divide-gray-100.rounded.shadow.w-44{id: "loggedInUserNavDropdown", "aria-labelledby"=>"loggedInUserNavItem"}
+              %li
+                %a.dropdown-item
+                  =button_to "Sign Out", destroy_user_session_path(), method: :delete, style: "cursor: pointer;"
+        -else
+          =link_to "Log In", new_session_path(User), class: "bg-blue-700 hover:bg-blue-600 text-white m-0 px-2 py-2 rounded"
+
+    - flash.each do |name, msg|
+      = content_tag :div, class: "alert alert-#{name == :error ? "danger" : "success" } alert-dismissable", role: "alert" do
+        %button.close{type: "button", data: {dismiss: "alert"} }
+          %span{aria: {hidden: "true"} } &times;
+          %span.sr-only Close
+        = msg
+    = yield

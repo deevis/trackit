@@ -1,0 +1,98 @@
+-color_axis = "['white', 'red']"
+-label = 'Error'
+-if params[:chart_type] == 'error_deviation'
+  -state_diffs = Station.build_state_errors(:deviation)
+-elsif params[:chart_type] == 'error_variance'
+  -state_diffs = Station.build_state_errors(:variance)
+-elsif params[:chart_type] == 'reality_check'
+  -state_diffs = Station.build_state_days_diff()
+  -color_axis = "['blue', 'white', 'red']"
+  -label = 'Actual temperature vs original prediction'
+  -# To make the range of values balanced and 0-centered
+  -min = state_diffs.values.min
+  -max = state_diffs.values.max
+  -if min.abs > max.abs
+    -state_diffs['ZZ'] = min.abs
+  -else
+    -state_diffs['ZZ'] = -1 * max.abs
+
+
+-elsif params[:chart_type] == 'diffs'
+  -state_diffs = Station.build_state_range_diffs
+  -label = "Range of predictions"
+
+-content_for(:head) do
+  :plain
+    <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+    <script type='text/javascript'>
+     google.charts.load('current', {
+       'packages': ['geochart'],
+       // Note: Because markers require geocoding, you'll need a mapsApiKey.
+       // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+       'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+     });
+     google.charts.setOnLoadCallback(drawMarkersMap);
+
+      function drawMarkersMap() {
+      var data = google.visualization.arrayToDataTable([
+        ['State',   '#{label.html_safe}'],
+        #{state_diffs.map{|k,v| "['#{k}',#{v}]"}.join(",").html_safe}
+      ]);
+
+      var options = {
+        width: 556, height: 347,
+        min: -15, max: 15,
+        region: 'US',
+        resolution: 'provinces',
+        colorAxis: {colors: #{color_axis.html_safe}, min: -15, max: 15}
+      };
+
+      var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    };
+    </script>
+
+.page-header
+  .float-right
+    = link_to 'New Station', from_lat_lon_form_stations_path, class: "bg-green-700 hover:bg-green-600 px-1 py-0 rounded text-white"
+      
+  %h1{class: 'text-3xl'} Listing #{@stations.length} Stations
+
+#chart_div
+
+%div{class: "relative overflow-x-auto shadow-md sm:rounded-lg"}
+  %table{class: "w-full text-sm text-left text-gray-500 dark:text-gray-400"}
+    %thead{class: "text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"}
+      %tr{class: "bg-white border-b dark:bg-gray-800 dark:border-gray-700"}
+        %th=sort_link(@q, :name)
+        %th=sort_link(@q, :code)
+        %th=sort_link(@q, :city)
+        %th=sort_link(@q, :state)
+        / %th Location
+        %th Temp
+        %th Range
+        %th=sort_link(@q, :current_forecast_temp_diff, "Diff")
+
+        %th Wind
+        %th Range
+        %th=sort_link(@q, :current_forecast_wind_diff, "Diff")
+
+        %th=sort_link(@q, :last_forecast_time, "Last Forecast")
+
+    %tbody
+      - @stations.each do |station|
+        %tr{class: "bg-white border-b dark:bg-gray-800 dark:border-gray-700"}
+          %td= link_to station.name, station
+          %td= station.code
+          %td= station.city
+          %td= station.state
+          / %td= station.properties.dig('relativeLocation', 'geometry', 'coordinates')
+          %td=station.current_temp
+          %td=station.current_forecast&.previous_prediction_range(:temp)
+          %td=render "shared/diff_badge", difference: station.current_forecast&.temp_diff
+
+          %td=station.current_wind
+          %td=station.current_forecast&.previous_prediction_range(:wind)
+          %td=render "shared/diff_badge", difference: station.current_forecast&.wind_diff
+
+          %td= station.current_forecast&.time.try(:strftime, "%m/%d/%Y %H:%M")

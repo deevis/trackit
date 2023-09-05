@@ -1,0 +1,97 @@
+.page-header
+  .float-right
+    = link_to 'Back', @forecast.station, class: 'bg-blue-500 hover:bg-blue-700 px-1 py-0 rounded text-white'
+  %h1{class: "text-3xl"}
+    Forecast
+    %small
+      =@forecast.station.name
+      %small
+        =l @forecast.time
+
+#previous-predictions
+
+.table-responsive
+  %table.table.table-condensed.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Time
+        %th Temperature
+        %th Wind
+        %th Forecast
+        %th Icon
+    %tbody
+      -@forecast.predictions.each do |prediction|
+        %tr 
+          %td= l prediction.start_time 
+          %td #{prediction.temperature} #{prediction.temperature_unit}
+          %td #{prediction.wind_speed} #{prediction.wind_unit} #{prediction.wind_direction}
+          %td= prediction.short_forecast
+          %td
+            .media-border.p-0.m-0
+              .m-0.p-0.rounded-circle{style: "max-width: 40px; max-height: 40px;"}
+                = image_tag(prediction.icon) rescue prediction.icon
+              
+-previous_data = [['Date', 'Temperature', 'WindSpeed']]
+-graph_type = 'LineChart'           
+-@forecast.station.predictions.where(start_time: @forecast.time).each do |p|
+  -seconds = @forecast.time - p.forecast.time
+  -days = seconds / (60*60*24)
+  -hours = ((days - days.to_i) * 24).to_i
+  -day_hours_ago = if days.to_i == 0 
+    - "#{hours} hours" 
+  -else
+    -"#{days.to_i} days #{hours} hours"
+  -previous_data << [ day_hours_ago, p.temperature, p.wind_speed]
+
+:javascript
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable(#{previous_data.to_json.html_safe});
+    var options = {
+      vAxis: {
+        logScale: false,
+        minValue: 0
+      },
+      hAxis: {
+        showTextEvery: 1,
+        slantedText: true,
+        slantedTextAngle: 45,
+        textStyle: {
+          fontSize: 10,
+          bold: false
+        }
+      },
+      series: {
+        // Gives each series an axis name that matches the Y-axis below.
+        0: {targetAxisIndex: 'Temperature'},
+        1: {targetAxisIndex: 'WindSpeed'}
+      },
+      axes: {
+        // Adds labels to each axis; they don't have to match the axis names.
+        y: {
+          Temperature: {label: 'Temperature'},
+          WindSpeed: {label: 'WindSpeed'}
+        }
+      },   
+      chartArea: {
+         top: 55,
+         height: '40%' 
+      },   
+      // vAxis: {
+      //   viewWindow: {
+      //     max: 120
+      //   }
+      // },         
+      title: 'Previous Predictions',
+      legend: { position: 'right' },
+      // width: 400,
+      height: 300
+    };
+
+    // var chart = new google.visualization.LineChart(document.getElementById('results_chart'));
+    var chart = new google.visualization.#{graph_type}(document.getElementById('previous-predictions'));
+
+    chart.draw(data, options);
+  }

@@ -1,0 +1,26 @@
+-tracked_site ||= @tracked_site || tsd.tracked_site
+-class_part = tracked_site.class.to_s.split("::").last.underscore
+-partials_folder = "tracked_sites/display_prices"
+-check_name = "#{partials_folder}/_#{class_part}"
+-show_date ||= 'true'
+-limit ||= nil
+-tsd ||= nil
+
+-if lookup_context.find_all(check_name).any?
+  =render "#{partials_folder}/#{class_part}", tsd: tsd, tracked_site: tracked_site, show_date: show_date, limit: limit
+-else
+  -last_price = nil
+  -count = 0
+  -tracked_site.build_price_journey(limit: limit || 5, for_specific_tsd: tsd).each_with_index do |tsd, idx|
+    -font_weight = idx == 0 ? 500 : 350
+    %div
+      %span.text-sm.whitespace-nowrap{style: "font-weight: #{font_weight};"}
+        -if tsd[:delta].nil?
+          %span=tsd[:price]
+        -elsif tsd[:delta] > 0
+          %span.text-green-700=tsd[:price]
+        -else
+          %span.text-red-700=tsd[:price]
+
+      -if show_date == 'true'
+        %span.text-xs.px-1.whitespace-nowrap=tsd[:date].strftime("%Y-%m-%d")
