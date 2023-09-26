@@ -74,8 +74,10 @@ module TrackedSites
       end
       puts "Nokogiri parsing #{filepath}"
       doc = Nokogiri::HTML(File.readlines(filepath).join("\n"))
-      div = doc.css("#rate-trends")
-      rows = div.css("table > tbody > tr")
+      # DBH - 2023-09-14 No longer within #rate-trends div
+      # div = doc.css("#rate-trends")
+      # DBH - 2023-09-14 However, it is the _only_ table within the doc
+      rows = doc.css("table > tbody > tr")
       data = rows.map{|r| {
         "product" => r.css("th").text, 
         "interest_rate" => r.css("td")[0].text.gsub(/[^\d\.]/, '').to_f, 
