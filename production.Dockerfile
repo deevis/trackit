@@ -62,6 +62,8 @@ RUN npm ci \
 
 RUN bundle exec rails assets:clobber assets:precompile
 
+RUN mkdir -p tmp/pids
+
 EXPOSE 3000
 
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
