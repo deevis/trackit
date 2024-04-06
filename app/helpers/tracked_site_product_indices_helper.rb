@@ -1,0 +1,2 @@
+module TrackedSiteProductIndicesHelper
+end

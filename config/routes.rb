@@ -1,11 +1,19 @@
 Rails.application.routes.draw do
+  resources :tracked_site_product_indices do
+    member do
+      get :import_products
+    end
+  end
+
   devise_for :users
+  
   resources :tracked_sites do
     member do
       get :scrape_latest
       post :add_child_variant
     end
   end
+  
   resources :stations do
     member do 
       get :retrieve_hourly_forecast

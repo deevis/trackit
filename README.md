@@ -20,7 +20,12 @@ rails db:migrate
 rails s
 ```
 
+## After adding new models, please annotate
 
+```
+ annotate --models
+ ```
+ 
 ## Deploy docker container
 
 ### Powershell - arm64 target  (raspberry pi, new macbooks...)

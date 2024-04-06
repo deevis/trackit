@@ -17,6 +17,9 @@
 #  wind_diff          :integer
 #  wind_diff_hours    :integer
 #  wind_diff_per_hour :float(24)
+#  end_time           :datetime
+#  current_temp       :integer
+#  current_wind       :integer
 #
 
 class Forecast < ApplicationRecord

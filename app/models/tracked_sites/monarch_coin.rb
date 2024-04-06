@@ -21,6 +21,7 @@
 #  unavailable                         :boolean          default(FALSE)
 #  tracked_site_parent_id              :bigint
 #  variant_definition                  :text(4294967295)
+#  tracked_site_product_index_id       :bigint
 #
 module TrackedSites
   class MonarchCoin < ::TrackedSite

@@ -21,6 +21,7 @@
 #  unavailable                         :boolean          default(FALSE)
 #  tracked_site_parent_id              :bigint
 #  variant_definition                  :text(4294967295)
+#  tracked_site_product_index_id       :bigint
 #
 
 require 'nokogiri'
@@ -40,6 +41,8 @@ class TrackedSite < ApplicationRecord
   belongs_to :lowest_price_tracked_site_datum, class_name: "TrackedSiteDatum", optional: true
   belongs_to :highest_price_tracked_site_datum, class_name: "TrackedSiteDatum", optional: true
 
+  belongs_to :tracked_site_product_index, optional: true
+  
   after_create :do_initial_scrape
   
   after_commit :raise_pricing_events, on: :update

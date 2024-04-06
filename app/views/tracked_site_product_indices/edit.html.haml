@@ -1,0 +1,10 @@
+.page-header
+  = link_to tracked_site_product_indices_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to @tracked_site_product_index, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-info-sign
+    Show
+  %h1 Editing tracked_site_product_index
+
+= render 'form'

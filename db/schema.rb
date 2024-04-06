@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_10_29_170902) do
+ActiveRecord::Schema[7.0].define(version: 2024_04_06_074204) do
   create_table "active_storage_attachments", charset: "utf8mb3", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -108,6 +108,17 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_29_170902) do
     t.check_constraint "json_valid(`data`)", name: "data"
   end
 
+  create_table "tracked_site_product_indices", charset: "utf8mb4", force: :cascade do |t|
+    t.string "tracked_site_class"
+    t.string "product_index_url"
+    t.string "category"
+    t.string "sub_category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "data", size: :long, collation: "utf8mb4_bin"
+    t.check_constraint "json_valid(`data`)", name: "data"
+  end
+
   create_table "tracked_sites", charset: "utf8mb3", force: :cascade do |t|
     t.string "name"
     t.string "url"
@@ -127,9 +138,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_29_170902) do
     t.boolean "unavailable", default: false
     t.bigint "tracked_site_parent_id"
     t.text "variant_definition", size: :long, collation: "utf8mb4_bin"
+    t.bigint "tracked_site_product_index_id"
     t.index ["highest_price_tracked_site_datum_id"], name: "fk_rails_e361b1f9c4"
     t.index ["lowest_price_tracked_site_datum_id"], name: "fk_rails_4fe7dc7b66"
     t.index ["tracked_site_parent_id"], name: "fk_rails_cb9dc3b646"
+    t.index ["tracked_site_product_index_id"], name: "index_tracked_sites_on_tracked_site_product_index_id"
     t.index ["url"], name: "index_tracked_sites_on_url", unique: true
     t.check_constraint "json_valid(`variant_definition`)", name: "variant_definition"
   end
@@ -166,5 +179,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_29_170902) do
   add_foreign_key "tracked_site_data", "tracked_sites"
   add_foreign_key "tracked_sites", "tracked_site_data", column: "highest_price_tracked_site_datum_id"
   add_foreign_key "tracked_sites", "tracked_site_data", column: "lowest_price_tracked_site_datum_id"
+  add_foreign_key "tracked_sites", "tracked_site_product_indices"
   add_foreign_key "tracked_sites", "tracked_sites", column: "tracked_site_parent_id"
 end

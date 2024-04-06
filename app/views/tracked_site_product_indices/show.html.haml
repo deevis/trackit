@@ -1,0 +1,39 @@
+.page-header
+  = link_to tracked_site_product_indices_path, class: 'action-back' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_tracked_site_path(@tracked_site_product_index), class: 'action-edit' do
+    Edit
+  %h2.text-2xl 
+    Showing #{@tracked_site_product_index.category} #{@tracked_site_product_index.sub_category} for #{@tracked_site_product_index.tracked_site_class}
+    %span.text-xs.text-gray-500
+      (#{link_to @tracked_site_product_index.product_index_url, @tracked_site_product_index.product_index_url, target: "_blank"})
+
+=link_to 'Import Products', import_products_tracked_site_product_index_path(@tracked_site_product_index), class: 'action-secondary float-right'
+
+- if @tracked_site_product_index.tracked_sites.length > 0
+  .flex.flex-row.justify-between.py-5.mx-10
+    .grid.grid-cols-1.gap-8.mx-5{class: "md:grid-cols-4"}
+      - @tracked_site_product_index.tracked_sites.each do |tracked_site|
+        %div
+          = render 'tracked_sites/card', tracked_site: tracked_site
+
+- else
+  %div.text-2xl.text-center.alert.alert-info
+    No tracked sites found for this index
+
+- if @tracked_site_product_index.data&.dig('product_urls')&.length > 0
+  %div.text-2xl.text-center.alert.alert-info
+    #{@tracked_site_product_index.data['product_urls'].length} product urls found
+    %span.text-xs.text-gray-500
+      (#{link_to @tracked_site_product_index.product_index_url, @tracked_site_product_index.product_index_url, target: "_blank"})
+
+  .grid.grid-cols-1.gap-8.mx-5{class: "md:grid-cols-4"}
+    - @tracked_site_product_index.data['product_urls'].each do |url|
+      %div
+        %a{href: url, target: "_blank"}= url
+- else
+  %div.text-2xl.text-center.alert.alert-info
+    No product urls found for this index
+    %span.text-xs.text-gray-500
+      (#{link_to @tracked_site_product_index.product_index_url, @tracked_site_product_index.product_index_url, target: "_blank"})

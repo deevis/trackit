@@ -21,6 +21,7 @@
 #  unavailable                         :boolean          default(FALSE)
 #  tracked_site_parent_id              :bigint
 #  variant_definition                  :text(4294967295)
+#  tracked_site_product_index_id       :bigint
 #
 module TrackedSites
   class BestBuy < ::TrackedSite
@@ -40,9 +41,31 @@ module TrackedSites
       "#{tracked_site_datum.start_time.strftime("%m/%d/%Y")} : $#{tracked_site_datum.data['price']} #{discounted_display}"
     end
 
+    # Provie the url of a page containing mulitple products to scrape
+    def self.scrape_product_urls(product_index_url)
+      # Define the URL to scrape
+      product_index_url ||= 'https://www.bestbuy.com/site/virtual-reality-devices-and-games/virtual-reality-headsets-for-pc/pcmcat1476726957734.c?id=pcmcat1476726957734'
+
+      # Open and read the URL
+      document = Nokogiri::HTML(URI.open(product_index_url))
+
+      # CSS Selector to find product links. This might need adjustments based on the actual page structure.      
+      product_links = document.css('a[href*="/site/"]')
+      product_urls = product_links.select{|link| link['href'].index("skuId")}.map do |link|
+        (link['href'].start_with?('http') ? link['href'] : "https://www.bestbuy.com#{link['href']}").split("#").first
+      end.uniq
+      product_urls
+    end
+
     def scrape_html(filepath=nil)
       doc = get_noko_doc(filepath)
       pricing_divs = doc.css('.pricing-price')
+      # set the name if it is not set already...
+      if self.name.blank?
+        # div.sku-title => h1
+        self.name = doc.css('.sku-title').text
+        self.save!
+      end
       if pricing_divs.length == 0
         inactive_message = doc.css(".inactive-product-message")&.first&.text
         if inactive_message.present?

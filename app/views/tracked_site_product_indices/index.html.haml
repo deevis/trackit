@@ -1,0 +1,34 @@
+.page-header
+  = link_to new_tracked_site_product_index_path, class: 'float-right action-secondary' do
+    %span.glyphicon.glyphicon-plus
+    New Tracked site product index
+  %h1.text-xl Listing Tracked Site Product Indices
+
+%div{class: "relative overflow-x-auto shadow-md sm:rounded-lg mt-4"}
+  %table{class: "w-full text-sm text-left text-gray-500 dark:text-gray-400"}
+    %thead{class: "text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"}
+      %tr{class: "bg-white border-b dark:bg-gray-800 dark:border-gray-700"}
+        %th Tracked Site Class
+        %th Product Index Url
+        %th Category
+        %th Sub Category
+        %th Product URLs
+        %th Linked Products
+        %th
+        %th
+        %th
+
+    %tbody
+      - @tracked_site_product_indices.each do |tracked_site_product_index|
+        %tr{class: "bg-white border-b dark:bg-gray-800 dark:border-gray-700"}
+          %td= tracked_site_product_index.tracked_site_class
+          %td= tracked_site_product_index.product_index_url
+          %td
+            = link_to tracked_sites_path(category: tracked_site_product_index.category,site_source: tracked_site_product_index.tracked_site_class), class: 'action-back' do
+              =tracked_site_product_index.category
+          %td= tracked_site_product_index.sub_category
+          %td= tracked_site_product_index.data&.dig('product_urls')&.length 
+          %td= tracked_site_product_index.tracked_sites.length
+          %td= link_to 'Show', tracked_site_product_index
+          %td= link_to 'Edit', edit_tracked_site_product_index_path(tracked_site_product_index)
+          %td= link_to 'Destroy', tracked_site_product_index, data: { confirm: 'Are you sure?' }, method: :delete, class: "bg-red-500 hover:bg-red-700 px-1 py-0 rounded text-white"
